@@ -82,27 +82,54 @@ const FALLBACK_DOCTORS = [
   },
 ];
 
-const FALLBACK_BLOGS = [
+export const FALLBACK_BLOGS = [
   {
     _id: "b1",
-    slug: "tips-to-boost-immunity",
-    title: "5 Tips to Boost Your Immunity Naturally",
+    slug: "boost-your-immunity-naturally",
+    title: "5 Everyday Habits to Boost Your Immunity",
     excerpt:
-      "Discover everyday habits that strengthen your immune system and improve overall wellness.",
+      "Simple lifestyle changes — hydration, sleep, and the right nutrition — can strengthen your natural defenses.",
+    image:
+      "https://images.unsplash.com/photo-1551198291-b23a97ce0b9a?auto=format&fit=crop&w=1000&q=60",
+    author: "Dr. Ayesha Khan",
+    readTime: "4 min read",
+    date: "Oct 2, 2025",
   },
   {
     _id: "b2",
-    slug: "how-telemedicine-is-changing-healthcare",
-    title: "How Telemedicine is Changing Healthcare",
+    slug: "telemedicine-is-changing-healthcare",
+    title: "How Telemedicine is Transforming Patient Care",
     excerpt:
-      "Virtual consultations are revolutionizing access to doctors worldwide. Here's how.",
+      "Virtual appointments are making healthcare more accessible, affordable, and responsive for patients.",
+    image:
+      "https://images.unsplash.com/photo-1618498082410-b4aa1ae0f32e?auto=format&fit=crop&w=1000&q=60",
+    author: "Dr. Imran Malik",
+    readTime: "6 min read",
+    date: "Sep 28, 2025",
   },
   {
     _id: "b3",
-    slug: "understanding-diabetes-management",
-    title: "Understanding Diabetes Management",
+    slug: "managing-diabetes-the-right-way",
+    title: "Managing Diabetes/Sugar the Right Way",
     excerpt:
-      "Learn how lifestyle, medication and monitoring help control diabetes effectively.",
+      "Monitoring sugar, staying active, and following doctor-led plans can dramatically reduce diabetes.",
+    image:
+      "https://images.unsplash.com/photo-1583361704493-d4d4d1b1d70b?auto=format&fit=crop&w=1000&q=60",
+    author: "Nutrition Team, CloudCare",
+    readTime: "5 min read",
+    date: "Sep 12, 2025",
+  },
+  {
+    _id: "b4",
+    slug: "heart-health-in-your-30s",
+    title: "Heart Health in Your 30s: What to Watch",
+    excerpt:
+      "BP, cholesterol, and stress management matter earlier than you think. Here's how to stay on track.",
+    image:
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=60",
+    author: "Cardiology Dept.",
+    readTime: "3 min read",
+    date: "Aug 30, 2025",
   },
 ];
 
@@ -112,7 +139,6 @@ const Home = () => {
   const [blogs, setBlogs] = useState(FALLBACK_BLOGS);
 
   useEffect(() => {
-    // SERVICES
     api
       .get("/api/services")
       .then((res) => {
@@ -128,7 +154,6 @@ const Home = () => {
         setServices(FALLBACK_SERVICES);
       });
 
-    // DOCTORS
     api
       .get("/api/doctors")
       .then((res) => {
@@ -144,7 +169,6 @@ const Home = () => {
         setDoctors(FALLBACK_DOCTORS);
       });
 
-    // BLOGS
     api
       .get("/api/blogs")
       .then((res) => {
@@ -179,16 +203,14 @@ const Home = () => {
       </Box>
 
       <Box sx={{ py: { xs: 5, md: 7 }, background: "#e7f6f9" }}>
-        <Container maxWidth="lg">
-          <SectionTitle title="Our Doctors" subtitle="SPECIALISTS" center />
-          <Grid container spacing={3} justifyContent="center">
-            {doctors.map((d) => (
-              <Grid key={d._id} item xs={12} sm={6} md={3}>
-                <DoctorCard item={d} />
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
+        <SectionTitle title="Our Doctors" subtitle="SPECIALISTS" center />
+        <Grid container spacing={3} justifyContent="center">
+          {doctors.map((d) => (
+            <Grid key={d._id} item xs={12} sm={6} md={3}>
+              <DoctorCard item={d} />
+            </Grid>
+          ))}
+        </Grid>
       </Box>
 
       <Pricing />
@@ -196,20 +218,18 @@ const Home = () => {
       <TestimonialSlider />
 
       <Box sx={{ py: { xs: 5, md: 7 }, background: "#f5f8fb" }}>
-        <Container maxWidth="lg">
-          <SectionTitle
-            title="Latest from blog"
-            subtitle="KNOWLEDGE CENTER"
-            center
-          />
-          <Grid container spacing={3}>
-            {blogs.map((b) => (
-              <Grid key={b._id} item xs={12} sm={6} md={4}>
-                <BlogCard item={b} />
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
+        <SectionTitle
+          title="Latest from blog"
+          subtitle="KNOWLEDGE CENTER"
+          center
+        />
+        <Grid container spacing={3} justifyContent="center">
+          {blogs.map((b) => (
+            <Grid key={b._id} item xs={12} sm={6} md={4}>
+              <BlogCard item={b} />
+            </Grid>
+          ))}
+        </Grid>
       </Box>
     </>
   );

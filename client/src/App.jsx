@@ -18,7 +18,13 @@ const App = () => {
   const { user } = useAuth();
 
   return (
-    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Navbar />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Routes>
