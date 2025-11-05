@@ -1,3 +1,4 @@
+// src/layout/Navbar.jsx
 import React from "react";
 import {
   AppBar,
@@ -11,25 +12,54 @@ import {
   ListItemButton,
   ListItemText,
   Divider,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.jsx";
 
-const navLinks = [
-  { label: "Home", to: "/" },
-  { label: "Services", to: "/services" },
-  { label: "Doctors", to: "/doctors" },
-  { label: "Appointment", to: "/appointment" },
-  { label: "Blog", to: "/blog" },
-  { label: "Contact", to: "/contact" },
-];
-
 const Navbar = () => {
-  const [open, setOpen] = React.useState(false);
+  const [openDrawer, setOpenDrawer] = React.useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // dropdown state
+  const [solutionsAnchor, setSolutionsAnchor] = React.useState(null);
+
+  // TOP LEVEL NAV (desktop)
+  // order: Home, Services, Solutions (dropdown), Pricing, Doctors, Appointment, Blog, Contact
+  const topLinks = [
+    { label: "Home", to: "/" },
+    { label: "Services", to: "/services" },
+    // Solutions is special (dropdown) – we won't map it here
+    { label: "Pricing", to: "/pricing" },
+    { label: "Doctors", to: "/doctors" },
+    { label: "Appointment", to: "/appointment" },
+    { label: "Blog", to: "/blog" },
+    { label: "Contact", to: "/contact" },
+  ];
+
+  // dropdown content (merged previous sub-navbar pages)
+  const solutionLinks = [
+    { label: "Modules / Features", to: "/modules" },
+    { label: "ALF / Senior Care", to: "/senior-care" },
+    { label: "Pharmacy Focus", to: "/pharmacy-focus" },
+    { label: "Workflows", to: "/workflows" },
+    { label: "Privacy", to: "/privacy" },
+  ];
+
+  // handlers for hover
+  const handleSolutionsEnter = (event) => {
+    setSolutionsAnchor(event.currentTarget);
+  };
+  const handleSolutionsLeave = () => {
+    setSolutionsAnchor(null);
+  };
+
+  const isSolutionsOpen = Boolean(solutionsAnchor);
 
   return (
     <>
@@ -39,26 +69,21 @@ const Navbar = () => {
         sx={{
           top: 0,
           py: { xs: 1, md: 2 },
-          background: "rgba(255,255,255,0.7)",
-          backdropFilter: "blur(15px)",
+          background: "rgba(255,255,255,0.8)",
+          backdropFilter: "blur(16px)",
           borderBottom: "1px solid rgba(15,124,144,0.03)",
-          transition: "all .35s ease",
           zIndex: 999,
-          animation: "navDrop .4s ease",
-          "@keyframes navDrop": {
-            from: { transform: "translateY(-20px)", opacity: 0 },
-            to: { transform: "translateY(0)", opacity: 1 },
-          },
         }}
       >
         <Toolbar sx={{ minHeight: 100, px: { xs: 1.5, md: 3 } }}>
           <Typography
             variant="h4"
             sx={{
-              flexGrow: 1,
+              flexGrow: { xs: 1, md: 0 },
               fontWeight: 700,
               color: "#0F7C90",
               cursor: "pointer",
+              mr: { md: 3 },
             }}
             onClick={() => navigate("/")}
           >
@@ -68,11 +93,13 @@ const Navbar = () => {
           <Box
             sx={{
               display: { xs: "none", md: "flex" },
-              gap: 0.5,
+              gap: 1,
+              justifyContent: "center",
               alignItems: "center",
+              flexGrow: 1,
             }}
           >
-            {navLinks.map((item) => {
+            {topLinks.slice(0, 2).map((item) => {
               const active = location.pathname === item.to;
               return (
                 <Button
@@ -116,6 +143,152 @@ const Navbar = () => {
               );
             })}
 
+            {/* SOLUTIONS (DROPDOWN) */}
+            <Box
+              onMouseEnter={handleSolutionsEnter}
+              onMouseLeave={handleSolutionsLeave}
+              sx={{ position: "relative" }}
+            >
+              <Button
+                disableRipple
+                endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 18 }} />}
+                sx={{
+                  position: "relative",
+                  px: 2,
+                  borderRadius: 999,
+                  fontWeight: 500,
+                  fontSize: 16,
+                  color: isSolutionsOpen
+                    ? "primary.main"
+                    : solutionLinks.some((s) =>
+                        location.pathname.startsWith(s.to)
+                      )
+                    ? "primary.main"
+                    : "text.primary",
+                  backgroundColor:
+                    isSolutionsOpen ||
+                    solutionLinks.some((s) =>
+                      location.pathname.startsWith(s.to)
+                    )
+                      ? "rgba(15,124,144,0.08)"
+                      : "transparent",
+                  "&:hover": {
+                    backgroundColor: "rgba(15,124,144,0.08)",
+                  },
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    left: "50%",
+                    bottom: 4,
+                    transform:
+                      solutionLinks.some((s) =>
+                        location.pathname.startsWith(s.to)
+                      ) || isSolutionsOpen
+                        ? "translateX(-50%) scaleX(1)"
+                        : "translateX(-50%) scaleX(0)",
+                    transformOrigin: "center",
+                    width: "24px",
+                    height: "2px",
+                    borderRadius: 999,
+                    background: "rgba(15,124,144,.95)",
+                    transition: "transform .2s ease",
+                  },
+                }}
+              >
+                Solutions
+              </Button>
+
+              {/* dropdown menu */}
+              <Menu
+                anchorEl={solutionsAnchor}
+                open={isSolutionsOpen}
+                onClose={handleSolutionsLeave}
+                MenuListProps={{
+                  onMouseLeave: handleSolutionsLeave,
+                  sx: { py: 1 },
+                }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                transformOrigin={{ vertical: "top", horizontal: "left" }}
+                PaperProps={{
+                  elevation: 3,
+                  sx: {
+                    mt: 1,
+                    borderRadius: 3,
+                    minWidth: 230,
+                    background: "rgba(255,255,255,0.9)",
+                    backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(11,134,157,0.12)",
+                  },
+                }}
+              >
+                {solutionLinks.map((item) => (
+                  <MenuItem
+                    key={item.to}
+                    onClick={() => {
+                      navigate(item.to);
+                      handleSolutionsLeave();
+                    }}
+                    selected={location.pathname === item.to}
+                    sx={{
+                      py: 1,
+                      fontWeight: location.pathname === item.to ? 600 : 400,
+                      fontSize: 14.5,
+                    }}
+                  >
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+
+            {/* rest of links: Pricing, Doctors, Appointment, Blog, Contact */}
+            {topLinks.slice(2).map((item) => {
+              const active = location.pathname === item.to;
+              return (
+                <Button
+                  key={item.to}
+                  component={Link}
+                  to={item.to}
+                  disableRipple
+                  sx={{
+                    position: "relative",
+                    px: 2,
+                    borderRadius: 999,
+                    fontWeight: 500,
+                    fontSize: 16,
+                    color: active ? "primary.main" : "text.primary",
+                    backgroundColor: active
+                      ? "rgba(15,124,144,0.08)"
+                      : "transparent",
+                    transition: "all .2s",
+                    "&:hover": {
+                      backgroundColor: "rgba(15,124,144,0.08)",
+                    },
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      left: "50%",
+                      bottom: 4,
+                      transform: active
+                        ? "translateX(-50%) scaleX(1)"
+                        : "translateX(-50%) scaleX(0)",
+                      transformOrigin: "center",
+                      width: "24px",
+                      height: "2px",
+                      borderRadius: 999,
+                      background: "rgba(15,124,144,.95)",
+                      transition: "transform .2s ease",
+                    },
+                  }}
+                >
+                  {item.label}
+                </Button>
+              );
+            })}
+          </Box>
+
+          {/* Right side auth buttons (desktop) */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
             {user ? (
               <>
                 <Button
@@ -124,7 +297,6 @@ const Navbar = () => {
                   sx={{
                     borderRadius: 999,
                     textTransform: "none",
-                    ml: 1,
                   }}
                 >
                   Dashboard
@@ -136,7 +308,6 @@ const Navbar = () => {
                   sx={{
                     borderRadius: 999,
                     textTransform: "none",
-                    ml: 1,
                     boxShadow: "0 12px 20px rgba(240,68,56,0.15)",
                   }}
                 >
@@ -152,7 +323,6 @@ const Navbar = () => {
                 sx={{
                   borderRadius: 999,
                   textTransform: "none",
-                  ml: 1,
                   px: 3,
                   boxShadow: "0 12px 26px rgba(15,124,144,.25)",
                 }}
@@ -162,28 +332,30 @@ const Navbar = () => {
             )}
           </Box>
 
+          {/* Mobile toggle */}
           <IconButton
             sx={{
               display: { xs: "inline-flex", md: "none" },
               ml: 1,
               scale: 1.4,
             }}
-            onClick={() => setOpen(true)}
+            onClick={() => setOpenDrawer(true)}
           >
             <MenuIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
 
+      {/* MOBILE DRAWER */}
       <Drawer
         anchor="left"
-        open={open}
-        onClose={() => setOpen(false)}
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
         PaperProps={{
           sx: {
-            background: "rgba(255,255,255,0.7)",
-            backdropFilter: "blur(16px)",
-            minWidth: 240,
+            background: "rgba(255,255,255,0.85)",
+            backdropFilter: "blur(12px)",
+            minWidth: 250,
           },
         }}
       >
@@ -197,18 +369,34 @@ const Navbar = () => {
         </Box>
         <Divider sx={{ mb: 1 }} />
         <List>
-          {navLinks.map((item) => (
+          {/* main links */}
+          {topLinks.map((item) => (
             <ListItemButton
               key={item.to}
               component={Link}
               to={item.to}
               selected={location.pathname === item.to}
-              onClick={() => setOpen(false)}
-              sx={{
-                borderRadius: 2,
-                mx: 1,
-                my: 0.3,
-              }}
+              onClick={() => setOpenDrawer(false)}
+              sx={{ mx: 1, borderRadius: 2 }}
+            >
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          ))}
+
+          {/* solutions group */}
+          <Divider sx={{ my: 1 }} />
+          <ListItemText
+            primary="Solutions"
+            sx={{ pl: 2, mb: 0.5, fontWeight: 700 }}
+          />
+          {solutionLinks.map((item) => (
+            <ListItemButton
+              key={item.to}
+              component={Link}
+              to={item.to}
+              selected={location.pathname === item.to}
+              onClick={() => setOpenDrawer(false)}
+              sx={{ pl: 3, borderRadius: 2 }}
             >
               <ListItemText primary={item.label} />
             </ListItemButton>
@@ -221,7 +409,7 @@ const Navbar = () => {
               <ListItemButton
                 onClick={() => {
                   navigate("/dashboard");
-                  setOpen(false);
+                  setOpenDrawer(false);
                 }}
               >
                 <ListItemText primary="Dashboard" />
@@ -229,7 +417,7 @@ const Navbar = () => {
               <ListItemButton
                 onClick={() => {
                   logout();
-                  setOpen(false);
+                  setOpenDrawer(false);
                 }}
               >
                 <ListItemText primary="Logout" />
@@ -239,7 +427,7 @@ const Navbar = () => {
             <ListItemButton
               onClick={() => {
                 navigate("/login");
-                setOpen(false);
+                setOpenDrawer(false);
               }}
             >
               <ListItemText primary="Login" />

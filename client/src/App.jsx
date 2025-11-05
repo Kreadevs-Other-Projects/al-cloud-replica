@@ -13,6 +13,13 @@ import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import { useAuth } from "./hooks/useAuth.jsx";
 import { Box } from "@mui/material";
+import Modules from "./pages/Modules.jsx";
+import SeniorCareHelp from "./pages/SeniorCareHelp.jsx";
+import PharmacyFocus from "./pages/PharmacyFocus.jsx";
+import Workflows from "./pages/Workflows.jsx";
+import Privacy from "./pages/Privacy.jsx";
+import NotFound from "./pages/NotFound.jsx";
+import PricingPage from "./pages/PricingPage.jsx";
 
 const App = () => {
   const { user } = useAuth();
@@ -40,6 +47,14 @@ const App = () => {
             path="/dashboard"
             element={user ? <Dashboard /> : <Login redirectTo="/dashboard" />}
           />
+          {/* New Pages */}
+          <Route path="/modules" element={<Modules />} />
+          <Route path="/senior-care" element={<SeniorCareHelp />} />
+          <Route path="/pharmacy-focus" element={<PharmacyFocus />} />
+          <Route path="/workflows" element={<Workflows />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>
       <Footer />

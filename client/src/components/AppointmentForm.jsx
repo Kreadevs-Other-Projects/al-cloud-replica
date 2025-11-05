@@ -7,36 +7,74 @@ import {
   MenuItem,
   Alert,
   CircularProgress,
+  InputAdornment,
+  Typography,
 } from "@mui/material";
 import api from "../api/axios.js";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
+
+const FALLBACK_SERVICES = [
+  { _id: "s1", title: "General Consultation" },
+  { _id: "s2", title: "Online / Telehealth" },
+  { _id: "s3", title: "Cardiology" },
+  { _id: "s4", title: "Diagnostics & Lab Tests" },
+];
+
+const FALLBACK_DOCTORS = [
+  { _id: "d1", name: "Dr. Ayesha Khan" },
+  { _id: "d2", name: "Dr. Imran Malik" },
+  { _id: "d3", name: "Dr. Fatima Noor" },
+];
 
 const AppointmentForm = () => {
-  const [services, setServices] = useState([]);
-  const [doctors, setDoctors] = useState([]);
+  const [services, setServices] = useState(FALLBACK_SERVICES);
+  const [doctors, setDoctors] = useState(FALLBACK_DOCTORS);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     patientName: "",
     patientEmail: "",
     patientPhone: "",
-    service: "",
-    doctor: "",
+    service: "Select Service",
+    doctor: "Select Doctor",
     date: "",
     notes: "",
   });
 
   useEffect(() => {
-    api.get("/api/services").then((res) => setServices(res.data));
-    api.get("/api/doctors").then((res) => setDoctors(res.data));
+    api
+      .get("/api/services")
+      .then((res) => {
+        if (Array.isArray(res.data) && res.data.length > 0)
+          setServices(res.data);
+      })
+      .catch(() => {});
+    api
+      .get("/api/doctors")
+      .then((res) => {
+        if (Array.isArray(res.data) && res.data.length > 0)
+          setDoctors(res.data);
+      })
+      .catch(() => {});
   }, []);
 
   const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setError("");
     setDone(false);
+
+    if (!form.patientName || !form.patientEmail || !form.service) {
+      setError("Please fill required fields (Name, Email, Service).");
+      return;
+    }
+
+    setLoading(true);
     try {
       await api.post("/api/appointments", form);
       setDone(true);
@@ -50,17 +88,28 @@ const AppointmentForm = () => {
         notes: "",
       });
     } catch (err) {
-      console.log(err);
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-      {done && <Alert severity="success">Appointment request submitted!</Alert>}
-      <Grid container spacing={2} sx={{ mt: 1 }}>
-        <Grid item xs={12} md={6}>
+    <Box component="form" onSubmit={handleSubmit}>
+      {done && (
+        <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+          Appointment request submitted! We’ll confirm shortly.
+        </Alert>
+      )}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      <Grid container spacing={2}>
+        {/* Full Name */}
+        <Grid item xs={12} sm={6} md={3}>
           <TextField
             label="Full Name"
             name="patientName"
@@ -68,9 +117,19 @@ const AppointmentForm = () => {
             onChange={handleChange}
             fullWidth
             required
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonOutlineIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+
+        {/* Email */}
+        <Grid item xs={12} sm={6} md={3}>
           <TextField
             label="Email"
             name="patientEmail"
@@ -79,18 +138,39 @@ const AppointmentForm = () => {
             fullWidth
             required
             type="email"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonOutlineIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+
+        {/* Phone */}
+        <Grid item xs={12} sm={6} md={3}>
           <TextField
             label="Phone"
             name="patientPhone"
             value={form.patientPhone}
             onChange={handleChange}
             fullWidth
+            required
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LocalPhoneIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+
+        {/* Service */}
+        <Grid item xs={12} sm={6} md={3}>
           <TextField
             select
             label="Service"
@@ -99,7 +179,11 @@ const AppointmentForm = () => {
             onChange={handleChange}
             fullWidth
             required
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           >
+            <MenuItem selected={true} value="Select Service">
+              Select Service
+            </MenuItem>
             {services.map((s) => (
               <MenuItem key={s._id} value={s._id}>
                 {s.title}
@@ -107,7 +191,9 @@ const AppointmentForm = () => {
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12} md={6}>
+
+        {/* Doctor */}
+        <Grid item xs={12} sm={6} md={3}>
           <TextField
             select
             label="Doctor"
@@ -115,7 +201,12 @@ const AppointmentForm = () => {
             value={form.doctor}
             onChange={handleChange}
             fullWidth
+            required
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           >
+            <MenuItem selected={true} value="Select Doctor">
+              Select Doctor
+            </MenuItem>
             {doctors.map((d) => (
               <MenuItem key={d._id} value={d._id}>
                 {d.name}
@@ -123,7 +214,9 @@ const AppointmentForm = () => {
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12} md={6}>
+
+        {/* Date */}
+        <Grid item xs={12} sm={6} md={2}>
           <TextField
             type="date"
             label="Preferred Date"
@@ -132,25 +225,58 @@ const AppointmentForm = () => {
             onChange={handleChange}
             fullWidth
             InputLabelProps={{ shrink: true }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <CalendarMonthIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           />
         </Grid>
-        <Grid item xs={12}>
+
+        {/* Notes */}
+        {/* <Grid item xs={12} md={8}>
           <TextField
-            label="Notes"
+            label="Notes / Symptoms / Message"
             name="notes"
             value={form.notes}
             onChange={handleChange}
             fullWidth
             multiline
             rows={3}
+            placeholder="Tell us what you’re feeling or what you need..."
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           />
-        </Grid>
-        <Grid item xs={12}>
+        </Grid> */}
+
+        {/* Button */}
+        <Grid
+          item
+          xs={12}
+          md={4}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: { xs: "flex-start", md: "flex-end" },
+          }}
+        >
           <Button
             type="submit"
             variant="contained"
             disabled={loading}
             startIcon={loading ? <CircularProgress size={20} /> : null}
+            sx={{
+              borderRadius: 999,
+              px: 4,
+              py: 2,
+              width: { xs: "100%", md: "auto" },
+              textTransform: "none",
+              fontWeight: 600,
+              boxShadow: "0 18px 30px rgba(11,134,157,0.25)",
+              right: 0,
+            }}
           >
             {loading ? "Submitting..." : "Book Appointment"}
           </Button>
