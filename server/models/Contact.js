@@ -12,6 +12,11 @@ const contactSchema = new mongoose.Schema(
       enum: ["new", "in-progress", "resolved"],
       default: "new",
     },
+    meta: {
+      ip: String,
+      ua: String,
+      ref: String,
+    },
   },
   { timestamps: true }
 );

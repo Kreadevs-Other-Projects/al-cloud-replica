@@ -1,12 +1,12 @@
-import React from "react";
 import { Card, CardContent, Typography, Box } from "@mui/material";
 
 const ServiceCard = ({ item }) => {
+  const iconIsEmoji =
+    item?.icon && item.icon.length <= 4 && !item.icon.includes("/");
   return (
     <Card
       sx={{
         borderRadius: 3,
-        width: 350,
         height: "100%",
         display: "flex",
         flexDirection: "column",
@@ -33,11 +33,24 @@ const ServiceCard = ({ item }) => {
             justifyContent: "center",
             alignItems: "center",
             mb: 2,
-            fontSize: 26,
+            fontSize: 28,
+            overflow: "hidden",
           }}
         >
-          {item.icon ? item.icon : "🩺"}
+          {iconIsEmoji ? (
+            item.icon
+          ) : item?.icon ? (
+            <img
+              src={item.icon}
+              alt=""
+              style={{ width: 28, height: 28, objectFit: "contain" }}
+              loading="lazy"
+            />
+          ) : (
+            "🩺"
+          )}
         </Box>
+
         <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>
           {item.title}
         </Typography>

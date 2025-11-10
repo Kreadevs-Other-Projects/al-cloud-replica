@@ -1,24 +1,59 @@
 import Blog from "../models/Blog.js";
 
 export const getBlogs = async (req, res) => {
-  const blogs = await Blog.find()
-    .populate("author", "name")
-    .sort({ createdAt: -1 });
-  res.json(blogs);
+  const page = Math.max(parseInt(req.query.page || "1", 10), 1);
+  const limit = Math.min(Math.max(parseInt(req.query.limit || "9", 10), 1), 50);
+  const q = (req.query.q || "").trim();
+  const category = (req.query.category || "").trim();
+
+  const filter = { isPublished: true };
+  if (category) filter.category = category;
+  if (q) filter.$text = { $search: q };
+
+  const [items, total] = await Promise.all([
+    Blog.find(filter)
+      .select("title slug excerpt coverImage category createdAt author")
+      .populate("author", "name")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    Blog.countDocuments(filter),
+  ]);
+
+  const out = items.map((b) => ({
+    ...b,
+    authorName: b.author?.name || "CloudCare Editorial",
+    date: new Date(b.createdAt).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+  }));
+
+  res.json({ items: out, total, page, pages: Math.ceil(total / limit) });
 };
 
 export const getBlogBySlug = async (req, res) => {
-  const blog = await Blog.findOne({ slug: req.params.slug });
+  const blog = await Blog.findOne({ slug: req.params.slug, isPublished: true })
+    .populate("author", "name")
+    .lean();
+
   if (!blog) return res.status(404).json({ message: "Not found" });
+
+  blog.authorName = blog.author?.name || "CloudCare Editorial";
+  blog.date = new Date(blog.createdAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
   res.json(blog);
 };
 
 export const createBlog = async (req, res) => {
   try {
-    const blog = await Blog.create({
-      ...req.body,
-      author: req.user._id,
-    });
+    const blog = await Blog.create({ ...req.body, author: req.user._id });
     res.status(201).json(blog);
   } catch (err) {
     res.status(400).json({ message: err.message });

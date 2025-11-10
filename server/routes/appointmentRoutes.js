@@ -4,15 +4,16 @@ import {
   createAppointment,
   updateAppointmentStatus,
   deleteAppointment,
+  getAvailability,
 } from "../controllers/appointmentController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.route("/").get(protect, getAppointments).post(createAppointment);
-router
-  .route("/:id")
-  .put(protect, updateAppointmentStatus)
-  .delete(protect, deleteAppointment);
+router.get("/", protect, getAppointments);
+router.post("/", createAppointment);
+router.get("/availability", getAvailability);
+router.put("/:id", protect, updateAppointmentStatus);
+router.delete("/:id", protect, deleteAppointment);
 
 export default router;

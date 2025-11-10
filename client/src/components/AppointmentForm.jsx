@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   TextField,
@@ -8,38 +8,25 @@ import {
   Alert,
   CircularProgress,
   InputAdornment,
-  Typography,
 } from "@mui/material";
 import api from "../api/axios.js";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 
-const FALLBACK_SERVICES = [
-  { _id: "s1", title: "General Consultation" },
-  { _id: "s2", title: "Online / Telehealth" },
-  { _id: "s3", title: "Cardiology" },
-  { _id: "s4", title: "Diagnostics & Lab Tests" },
-];
-
-const FALLBACK_DOCTORS = [
-  { _id: "d1", name: "Dr. Ayesha Khan" },
-  { _id: "d2", name: "Dr. Imran Malik" },
-  { _id: "d3", name: "Dr. Fatima Noor" },
-];
-
 const AppointmentForm = () => {
-  const [services, setServices] = useState(FALLBACK_SERVICES);
-  const [doctors, setDoctors] = useState(FALLBACK_DOCTORS);
+  const [services, setServices] = useState([]);
+  const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+
   const [form, setForm] = useState({
     patientName: "",
     patientEmail: "",
     patientPhone: "",
-    service: "Select Service",
-    doctor: "Select Doctor",
+    service: "",
+    doctor: "",
     date: "",
     notes: "",
   });
@@ -48,18 +35,35 @@ const AppointmentForm = () => {
     api
       .get("/api/services")
       .then((res) => {
-        if (Array.isArray(res.data) && res.data.length > 0)
-          setServices(res.data);
+        const arr = Array.isArray(res.data)
+          ? res.data.filter((s) => s.isActive !== false)
+          : [];
+        setServices(arr);
       })
       .catch(() => {});
     api
       .get("/api/doctors")
       .then((res) => {
-        if (Array.isArray(res.data) && res.data.length > 0)
-          setDoctors(res.data);
+        const arr = Array.isArray(res.data?.items)
+          ? res.data.items
+          : Array.isArray(res.data)
+          ? res.data
+          : [];
+        setDoctors(arr.filter((d) => d.isActive !== false));
       })
       .catch(() => {});
   }, []);
+
+  const filteredDoctors = useMemo(() => {
+    if (!form.service) return doctors;
+    const svc = services.find((s) => s._id === form.service);
+    if (!svc) return doctors;
+    const key = (svc.title || "").toLowerCase();
+    const subset = doctors.filter((d) =>
+      (d.specialty || "").toLowerCase().includes(key.split(" ")[0])
+    );
+    return subset.length ? subset : doctors;
+  }, [form.service, doctors, services]);
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -69,8 +73,16 @@ const AppointmentForm = () => {
     setError("");
     setDone(false);
 
-    if (!form.patientName || !form.patientEmail || !form.service) {
-      setError("Please fill required fields (Name, Email, Service).");
+    if (
+      !form.patientName ||
+      !form.patientEmail ||
+      !form.service ||
+      !form.doctor ||
+      !form.date
+    ) {
+      setError(
+        "Please fill required fields (Name, Email, Service, Doctor, Date)."
+      );
       return;
     }
 
@@ -88,11 +100,16 @@ const AppointmentForm = () => {
         notes: "",
       });
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      const msg =
+        err?.response?.data?.message ||
+        "Something went wrong. Please try again.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
+
+  const todayISO = new Date().toISOString().slice(0, 10);
 
   return (
     <Box component="form" onSubmit={handleSubmit}>
@@ -108,7 +125,6 @@ const AppointmentForm = () => {
       )}
 
       <Grid container spacing={2}>
-        {/* Full Name */}
         <Grid item xs={12} sm={6} md={3}>
           <TextField
             label="Full Name"
@@ -128,7 +144,6 @@ const AppointmentForm = () => {
           />
         </Grid>
 
-        {/* Email */}
         <Grid item xs={12} sm={6} md={3}>
           <TextField
             label="Email"
@@ -149,7 +164,6 @@ const AppointmentForm = () => {
           />
         </Grid>
 
-        {/* Phone */}
         <Grid item xs={12} sm={6} md={3}>
           <TextField
             label="Phone"
@@ -169,14 +183,16 @@ const AppointmentForm = () => {
           />
         </Grid>
 
-        {/* Service */}
         <Grid item xs={12} sm={6} md={3}>
           <TextField
             select
             label="Service"
             name="service"
             value={form.service}
-            onChange={handleChange}
+            onChange={(e) => {
+              handleChange(e);
+              setForm((prev) => ({ ...prev, doctor: "" }));
+            }}
             fullWidth
             required
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
@@ -192,7 +208,6 @@ const AppointmentForm = () => {
           </TextField>
         </Grid>
 
-        {/* Doctor */}
         <Grid item xs={12} sm={6} md={3}>
           <TextField
             select
@@ -207,15 +222,14 @@ const AppointmentForm = () => {
             <MenuItem selected={true} value="Select Doctor">
               Select Doctor
             </MenuItem>
-            {doctors.map((d) => (
+            {filteredDoctors.map((d) => (
               <MenuItem key={d._id} value={d._id}>
-                {d.name}
+                {d.name} {!!d.specialty && `— ${d.specialty}`}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
 
-        {/* Date */}
         <Grid item xs={12} sm={6} md={2}>
           <TextField
             type="date"
@@ -224,6 +238,7 @@ const AppointmentForm = () => {
             value={form.date}
             onChange={handleChange}
             fullWidth
+            inputProps={{ min: todayISO }}
             InputLabelProps={{ shrink: true }}
             InputProps={{
               startAdornment: (
@@ -236,8 +251,8 @@ const AppointmentForm = () => {
           />
         </Grid>
 
-        {/* Notes */}
-        {/* <Grid item xs={12} md={8}>
+        {/* Optional Notes */}
+        {/* <Grid item xs={12} md={7}>
           <TextField
             label="Notes / Symptoms / Message"
             name="notes"
@@ -251,7 +266,6 @@ const AppointmentForm = () => {
           />
         </Grid> */}
 
-        {/* Button */}
         <Grid
           item
           xs={12}
@@ -275,7 +289,6 @@ const AppointmentForm = () => {
               textTransform: "none",
               fontWeight: 600,
               boxShadow: "0 18px 30px rgba(11,134,157,0.25)",
-              right: 0,
             }}
           >
             {loading ? "Submitting..." : "Book Appointment"}

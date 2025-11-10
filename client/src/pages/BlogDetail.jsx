@@ -1,5 +1,4 @@
-// src/pages/BlogDetail.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -11,45 +10,35 @@ import {
   Divider,
 } from "@mui/material";
 import { useParams, Link as RouterLink } from "react-router-dom";
-
-const BLOG_CONTENT = {
-  "assisted-living-emar-software": {
-    title: "Assisted Living EMAR Software – Why it matters in 2025",
-    date: "Oct 12, 2025",
-    author: "CloudCare Editorial",
-    readTime: "5 min read",
-    body: [
-      "Assisted living and group home providers still struggle with paper MARs, late med passes and poor communication with the pharmacy.",
-      "A modern eMAR system connects the community, the staff and the pharmacy so medication changes, discontinued orders and new residents are all in sync.",
-      "In AL settings, staff turnover is higher — so you need a system that is simple, guided and mobile-friendly. That’s what most paper processes fail to do.",
-      "When your eMAR is part of the SAME platform as your e-Docs, e-Consents, work orders and HR, you avoid multiple logins and reduce training time for new staff.",
-      "Finally, a good EMAR should be pharmacy-friendly: allow bidirectional data, reduce medication wastage and support compliance / survey requirements.",
-    ],
-  },
-};
-
-const FALLBACK = {
-  title: "CloudCare Blog",
-  date: "Oct 1, 2025",
-  author: "CloudCare Editorial",
-  readTime: "4 min read",
-  body: [
-    "This is a blog article detail page.",
-    "You navigated here from the blog card. You can render dynamic content from your API here.",
-  ],
-};
+import api from "../api/axios.js";
+import { Fallback } from "../constants/blogDetail.js";
 
 const BlogDetail = () => {
   const { slug } = useParams();
-  const data = BLOG_CONTENT[slug] || FALLBACK;
+  const [post, setPost] = useState(Fallback);
+
+  useEffect(() => {
+    api
+      .get(`/api/blogs/slug/${slug}`)
+      .then((res) => {
+        const d = res.data;
+        setPost({
+          title: d.title,
+          date: d.date,
+          authorName: d.authorName || "CloudCare Editorial",
+          readTime: d.readTime || "",
+          content: d.content || d.excerpt || "",
+        });
+      })
+      .catch(() => setPost(Fallback));
+  }, [slug]);
 
   return (
     <>
-      {/* HERO */}
       <Box
         sx={{
           background:
-            "linear-gradient(140deg, #ebfbff 0%, #ffffff 46%, #dff3f8 95%)",
+            "linear-gradient(140deg,#ebfbff 0%,#ffffff 46%,#dff3f8 95%)",
           py: { xs: 6, md: 7 },
           borderBottom: "1px solid rgba(15,124,144,0.05)",
         }}
@@ -59,11 +48,11 @@ const BlogDetail = () => {
             <MuiLink underline="hover" component={RouterLink} to="/">
               Home
             </MuiLink>
-            <MuiLink underline="hover" component={RouterLink} to="/blogs">
-              Blogs
+            <MuiLink underline="hover" component={RouterLink} to="/blog">
+              Blog
             </MuiLink>
             <Typography color="text.primary">
-              {data.title.slice(0, 32)}...
+              {post.title?.slice(0, 32)}...
             </Typography>
           </Breadcrumbs>
 
@@ -71,15 +60,15 @@ const BlogDetail = () => {
             variant="h3"
             sx={{ fontWeight: 700, mb: 1.5, color: "#0f172a" }}
           >
-            {data.title}
+            {post.title}
           </Typography>
           <Typography sx={{ opacity: 0.65 }}>
-            {data.date} · {data.author} · {data.readTime}
+            {post.date} · {post.authorName}{" "}
+            {post.readTime ? `· ${post.readTime}` : ""}
           </Typography>
         </Container>
       </Box>
 
-      {/* CONTENT */}
       <Box sx={{ py: { xs: 5, md: 6 }, background: "#f5f8fb" }}>
         <Container maxWidth="lg">
           <Paper
@@ -93,17 +82,11 @@ const BlogDetail = () => {
             }}
           >
             <Stack spacing={2.5}>
-              {data.body.map((p, i) => (
-                <Typography key={i} sx={{ lineHeight: 1.7, opacity: 0.9 }}>
-                  {p}
-                </Typography>
-              ))}
-
+              <div dangerouslySetInnerHTML={{ __html: post.content }} />
               <Divider />
-
               <Typography variant="caption" sx={{ opacity: 0.5 }}>
-                If you want a demo of CloudCare EMAR for Assisted Living / Group
-                Homes, contact us.
+                Want a demo of CloudCare eMAR for Assisted Living / Group Homes?
+                Contact us.
               </Typography>
             </Stack>
           </Paper>

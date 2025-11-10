@@ -1,5 +1,13 @@
-import React from "react";
 import { Card, CardContent, Typography, Avatar, Box } from "@mui/material";
+
+const initials = (name = "") =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
 const DoctorCard = ({ item }) => {
   return (
@@ -19,25 +27,20 @@ const DoctorCard = ({ item }) => {
         },
       }}
     >
-      <Box
-        sx={{
-          position: "relative",
-          display: "inline-block",
-          mb: 2,
-        }}
-      >
+      <Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
         <Avatar
           src={item.image}
+          alt={item.name}
           sx={{
             width: 100,
             height: 100,
             mx: "auto",
             bgcolor: "primary.main",
-            fontWeight: 600,
-            fontSize: 28,
+            fontWeight: 700,
+            fontSize: 24,
           }}
         >
-          {item.name?.[0]}
+          {initials(item.name)}
         </Avatar>
         <Box
           sx={{
@@ -49,7 +52,7 @@ const DoctorCard = ({ item }) => {
         />
       </Box>
       <CardContent sx={{ pt: 0 }}>
-        <Typography variant="h6" fontWeight={600}>
+        <Typography variant="h6" fontWeight={700}>
           {item.name}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>

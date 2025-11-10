@@ -134,11 +134,11 @@ const BlogCard = ({ item, index = 0 }) => {
                 sx={{ width: 32, height: 32, bgcolor: "#0b869d" }}
                 src={item.authorImage}
               >
-                {item.author?.[0] || "C"}
+                {(item.authorName || item.author || "C")[0]}
               </Avatar>
               <Box>
                 <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                  {item.author || "CloudCare Editorial"}
+                  {item.authorName || item.author || "CloudCare Editorial"}
                 </Typography>
                 <Typography variant="caption" sx={{ display: "block" }}>
                   {item.date || "Oct 12, 2025"}

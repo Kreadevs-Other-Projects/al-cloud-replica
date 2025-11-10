@@ -14,6 +14,7 @@ import blogRoutes from "./routes/blogRoutes.js";
 import testimonialRoutes from "./routes/testimonialRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
+import { contactLimiter } from "./config/rateLimit.js";
 
 dotenv.config();
 const app = express();
@@ -37,7 +38,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/appointments", appointmentRoutes);
-app.use("/api/contact", contactRoutes);
+app.use("/api/contact", contactLimiter, contactRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/upload", uploadRoutes);
