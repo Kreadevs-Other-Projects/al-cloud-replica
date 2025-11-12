@@ -13,7 +13,6 @@ import AppointmentForm from "../components/AppointmentForm.jsx";
 const Appointment = () => {
   return (
     <>
-      {/* top hero */}
       <Box
         sx={{
           background:
@@ -50,11 +49,9 @@ const Appointment = () => {
         </Container>
       </Box>
 
-      {/* main content */}
       <Box sx={{ py: { xs: 5, md: 6 }, background: "#f5f8fb" }}>
         <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="stretch">
-            {/* form */}
             <Grid item xs={12} md={7}>
               <Paper
                 elevation={0}
@@ -76,7 +73,6 @@ const Appointment = () => {
               </Paper>
             </Grid>
 
-            {/* right side info */}
             <Grid item xs={12} md={5}>
               <Stack spacing={3} sx={{ height: "100%" }}>
                 <Paper
@@ -194,7 +190,6 @@ const Appointment = () => {
         </Container>
       </Box>
 
-      {/* page animations */}
       <style>
         {`
         @keyframes slideUp {

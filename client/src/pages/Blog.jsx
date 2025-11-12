@@ -11,10 +11,9 @@ import {
 } from "@mui/material";
 import BlogCard from "../components/BlogCard.jsx";
 import api from "../api/axios.js";
-import { FALLBACK_BLOGS } from "../constants/blogs.js";
 
 const Blogs = () => {
-  const [blogs, setBlogs] = useState(FALLBACK_BLOGS);
+  const [blogs, setBlogs] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
 
@@ -23,13 +22,12 @@ const Blogs = () => {
       .get(`/api/blogs?page=${page}&limit=9`)
       .then((res) => {
         const items = Array.isArray(res.data?.items) ? res.data.items : [];
-        if (items.length) {
-          setBlogs(items);
-          setPages(res.data.pages || 1);
-        }
+        setBlogs(items);
+        setPages(res.data.pages || 1);
       })
-      .catch(() => {
-        setBlogs(FALLBACK_BLOGS);
+      .catch((err) => {
+        console.error("Failed to fetch blogs:", err);
+        setBlogs([]);
         setPages(1);
       });
   }, [page]);
@@ -64,9 +62,9 @@ const Blogs = () => {
       <Box sx={{ py: { xs: 5, md: 6 }, background: "#f5f8fb" }}>
         <Container maxWidth="lg">
           <Grid container spacing={3}>
-            {blogs.map((b, idx) => (
+            {blogs.map((b) => (
               <Grid key={b._id || b.slug} item xs={12} sm={6} md={4}>
-                <BlogCard item={b} index={idx} />
+                <BlogCard item={b} />
               </Grid>
             ))}
           </Grid>

@@ -16,6 +16,7 @@ import {
   Alert,
 } from "@mui/material";
 import api from "../api/axios.js";
+import Contact from "./Contact.jsx";
 
 const INTEGRATIONS = [
   {
@@ -167,7 +168,6 @@ const Workflows = () => {
           </Grid>
         </Container>
       </Box>
-      {/* COVERS ALL AREAS */}
       <Box sx={{ py: { xs: 4, md: 5 }, background: "#fff" }}>
         <Container maxWidth="lg">
           <Typography
@@ -203,92 +203,7 @@ const Workflows = () => {
           </Grid>
         </Container>
       </Box>
-
-      {/* DEMO / CONTACT */}
-      <Box
-        sx={{
-          py: { xs: 5, md: 6 },
-          background: "linear-gradient(180deg,#e7f6f9 0%,#f9fbfc 70%)",
-        }}
-      >
-        <Container maxWidth="lg">
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={6}>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                Show me these workflows
-              </Typography>
-              <Typography sx={{ opacity: 0.7, mb: 3 }}>
-                Tell us what you want to connect (eFax, HR, billing, docs…)
-              </Typography>
-
-              <Box component="form" onSubmit={handleSubmit}>
-                {sent && (
-                  <Alert
-                    severity="success"
-                    sx={{ mb: 2, borderRadius: 2 }}
-                    onClose={() => setSent(false)}
-                  >
-                    Thank you! We will be in touch soon.
-                  </Alert>
-                )}
-                <Stack spacing={2}>
-                  <TextField
-                    label="Name"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    fullWidth
-                    required
-                  />
-                  <TextField
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    fullWidth
-                    required
-                  />
-                  <TextField
-                    label="Which modules to connect?"
-                    name="message"
-                    value={form.message}
-                    onChange={handleChange}
-                    fullWidth
-                    multiline
-                    rows={3}
-                  />
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    disabled={sending}
-                    sx={{
-                      borderRadius: 999,
-                      px: 4,
-                      py: 1.1,
-                      textTransform: "none",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {sending ? "Sending..." : "Submit"}
-                  </Button>
-                </Stack>
-              </Box>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  borderRadius: 4,
-                  minHeight: 240,
-                  background:
-                    "linear-gradient(160deg, rgba(5,99,123,0.12) 0%, rgba(5,99,123,0) 45%), url(https://images.unsplash.com/photo-1604691887309-456a5c13904e?auto=format&fit=crop&w=1400&q=70) center/cover",
-                }}
-              />
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
+      <Contact />
     </>
   );
 };

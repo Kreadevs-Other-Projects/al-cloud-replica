@@ -1,4 +1,3 @@
-// src/pages/Modules.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -14,8 +13,8 @@ import {
   Breadcrumbs,
   Link as MuiLink,
 } from "@mui/material";
+import Contact from "./Contact.jsx";
 
-// data taken from the reference site sections
 const MODULE_GROUPS = [
   {
     id: "care",
@@ -157,7 +156,6 @@ const Modules = () => {
 
   return (
     <>
-      {/* top header */}
       <Box
         sx={{
           background:
@@ -209,11 +207,9 @@ const Modules = () => {
         </Container>
       </Box>
 
-      {/* main content */}
       <Box sx={{ py: { xs: 5, md: 6 }, background: "#f5f8fb" }}>
         <Container maxWidth="lg">
           <Grid container spacing={4}>
-            {/* left tabs */}
             <Grid item xs={12} md={3}>
               <Box
                 sx={{
@@ -263,7 +259,6 @@ const Modules = () => {
               </Box>
             </Grid>
 
-            {/* right content */}
             <Grid item xs={12} md={9}>
               <Box
                 sx={{
@@ -360,6 +355,7 @@ const Modules = () => {
             }
           `}
         </style>
+        <Contact />
       </Box>
     </>
   );

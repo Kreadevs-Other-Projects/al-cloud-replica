@@ -11,11 +11,10 @@ import {
 } from "@mui/material";
 import { useParams, Link as RouterLink } from "react-router-dom";
 import api from "../api/axios.js";
-import { Fallback } from "../constants/blogDetail.js";
 
 const BlogDetail = () => {
   const { slug } = useParams();
-  const [post, setPost] = useState(Fallback);
+  const [post, setPost] = useState(null);
 
   useEffect(() => {
     api
@@ -24,14 +23,18 @@ const BlogDetail = () => {
         const d = res.data;
         setPost({
           title: d.title,
-          date: d.date,
-          authorName: d.authorName || "CloudCare Editorial",
-          readTime: d.readTime || "",
+          date: new Date(d.createdAt).toLocaleDateString(),
+          authorName: d.author?.name || "CloudCare Editorial",
           content: d.content || d.excerpt || "",
         });
       })
-      .catch(() => setPost(Fallback));
+      .catch((err) => {
+        console.error("Failed to fetch blog detail:", err);
+        setPost(null);
+      });
   }, [slug]);
+
+  if (!post) return <Typography>Loading...</Typography>;
 
   return (
     <>
@@ -63,8 +66,7 @@ const BlogDetail = () => {
             {post.title}
           </Typography>
           <Typography sx={{ opacity: 0.65 }}>
-            {post.date} · {post.authorName}{" "}
-            {post.readTime ? `· ${post.readTime}` : ""}
+            {post.date} · {post.authorName}
           </Typography>
         </Container>
       </Box>

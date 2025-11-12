@@ -9,6 +9,7 @@ import {
   Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import doctorImg from "../assets/doctor.png";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -169,117 +170,19 @@ const Hero = () => {
               sx={{
                 position: "relative",
                 display: { xs: "none", md: "block" },
+                textAlign: "center",
               }}
             >
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: -40,
-                  right: 30,
-                  width: 160,
-                  height: 160,
-                  borderRadius: "50%",
-                  background: "rgba(14,116,144,0.12)",
-                  filter: "blur(2px)",
+              <img
+                src={doctorImg}
+                alt="Dashboard illustration"
+                style={{
+                  width: "150%",
+                  maxWidth: "600px",
+                  borderRadius: "20px",
+                  scale: "131%",
                 }}
               />
-              <Paper
-                elevation={6}
-                sx={{
-                  ml: "auto",
-                  width: 420,
-                  borderRadius: 5,
-                  background: "rgba(255,255,255,0.6)",
-                  backdropFilter: "blur(15px)",
-                  border: "1px solid rgba(255,255,255,0.4)",
-                  p: 3,
-                  position: "relative",
-                  zIndex: 2,
-                }}
-              >
-                <Typography variant="h6" sx={{ mb: 1 }}>
-                  Today’s appointments
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2 }}
-                >
-                  3 new teleconsultations booked, 1 follow-up and 2 lab results
-                  ready.
-                </Typography>
-
-                <Stack spacing={1.5}>
-                  <Box
-                    sx={{
-                      p: 1.2,
-                      borderRadius: 2,
-                      background: "#0f7c9012",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="subtitle2">
-                        Dr. Ayesha Khan
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Cardiology · 11:30 AM
-                      </Typography>
-                    </Box>
-                    <Button size="small" variant="text">
-                      Join
-                    </Button>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      p: 1.2,
-                      borderRadius: 2,
-                      background: "#fff",
-                      border: "1px solid #edf2f7",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="subtitle2">
-                        Lab report ready
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Patient: Sara · CBC
-                      </Typography>
-                    </Box>
-                    <Button size="small" variant="outlined">
-                      View
-                    </Button>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      p: 1.2,
-                      borderRadius: 2,
-                      background: "#fff",
-                      border: "1px solid #edf2f7",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="subtitle2">Home nursing</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        2:15 PM · Assigned
-                      </Typography>
-                    </Box>
-                    <Button size="small" variant="text">
-                      Details
-                    </Button>
-                  </Box>
-                </Stack>
-              </Paper>
             </Box>
           </Grid>
         </Grid>

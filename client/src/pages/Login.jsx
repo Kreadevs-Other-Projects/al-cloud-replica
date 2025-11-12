@@ -1,4 +1,3 @@
-// src/pages/Auth.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -22,8 +21,8 @@ import { useAuth } from "../hooks/useAuth.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Auth = ({ redirectTo = "/" }) => {
-  const { login, signup } = useAuth(); // make sure your context exposes signup, or we’ll mock below
-  const [mode, setMode] = useState("login"); // "login" | "signup"
+  const { login, signup } = useAuth();
+  const [mode, setMode] = useState("login");
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [signupForm, setSignupForm] = useState({
     name: "",
@@ -51,11 +50,9 @@ const Auth = ({ redirectTo = "/" }) => {
     e.preventDefault();
     setError("");
     try {
-      // if your context has no signup yet, comment next line and just nav
       if (signup) {
         await signup(signupForm.name, signupForm.email, signupForm.password);
       }
-      // you can auto-login or redirect to login
       await login(signupForm.email, signupForm.password);
       nav(dest, { replace: true });
     } catch (err) {
@@ -103,7 +100,6 @@ const Auth = ({ redirectTo = "/" }) => {
             animation: "slideUp .55s ease",
           }}
         >
-          {/* toggle */}
           <Stack
             direction="row"
             sx={{

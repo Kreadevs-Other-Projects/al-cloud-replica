@@ -18,7 +18,6 @@ const Dashboard = () => {
   const [contacts, setContacts] = useState([]);
 
   useEffect(() => {
-    // endpoints are protected
     api
       .get("/api/appointments")
       .then((res) => setAppointments(res.data))

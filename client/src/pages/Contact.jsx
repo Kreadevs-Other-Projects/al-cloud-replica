@@ -22,6 +22,7 @@ import api from "../api/axios.js";
 const Contact = () => {
   const [done, setDone] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -37,6 +38,8 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
+    setError("");
+
     try {
       if (!form.name || !form.email || !form.message) {
         throw new Error("Please fill Name, Email and Message.");
@@ -46,18 +49,26 @@ const Contact = () => {
       }
       if (form.website?.trim()) return setSending(false);
 
-      await api.post("/api/contact", form);
-      setDone(true);
-      setForm({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
-        website: "",
-      });
+      const res = await api.post("/api/contact", form);
+
+      if (res.status === 201) {
+        setDone(true);
+        setForm({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+          website: "",
+        });
+      } else {
+        throw new Error("Failed to submit contact form.");
+      }
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      setError(
+        err.response?.data?.message || err.message || "Something went wrong."
+      );
     } finally {
       setSending(false);
     }
@@ -119,6 +130,16 @@ const Contact = () => {
                   >
                     We’ve received your message. Our care team will contact you
                     soon.
+                  </Alert>
+                )}
+
+                {error && (
+                  <Alert
+                    severity="error"
+                    sx={{ mb: 2, borderRadius: 2 }}
+                    onClose={() => setError("")}
+                  >
+                    {error}
                   </Alert>
                 )}
 
@@ -203,11 +224,10 @@ const Contact = () => {
                       />
                     </Grid>
 
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
                         required
-                        multiline
                         rows={4}
                         label="Message"
                         name="message"
@@ -236,9 +256,11 @@ const Contact = () => {
                     <Grid
                       item
                       xs={12}
+                      md={4}
                       sx={{
                         display: "flex",
-                        justifyContent: { xs: "stretch", md: "flex-end" },
+                        alignItems: "center",
+                        justifyContent: { xs: "flex-start", md: "flex-end" },
                       }}
                     >
                       <Button
@@ -265,151 +287,154 @@ const Contact = () => {
             </Fade>
           </Grid>
 
-          <Grid item xs={12} md={5}>
-            <Fade in timeout={520}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2.5,
-                  height: "100%",
-                }}
-              >
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 3,
-                    borderRadius: 4,
-                    background: "rgba(255,255,255,0.92)",
-                    border: "1px solid rgba(15,124,144,0.06)",
-                    boxShadow: "0 10px 24px rgba(15,124,144,0.08)",
-                  }}
-                >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ opacity: 0.65, mb: 1.5 }}
-                  >
-                    Contact details
-                  </Typography>
-
-                  <Stack spacing={2}>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Box
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 2,
-                          bgcolor: "rgba(11,134,157,0.12)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "primary.main",
-                          flex: "0 0 auto",
-                        }}
-                      >
-                        <EmailOutlinedIcon fontSize="small" />
-                      </Box>
-                      <Box>
-                        <Typography variant="body2">
-                          hello@cloudcare.com
-                        </Typography>
-                        <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                          for appointments & support
-                        </Typography>
-                      </Box>
-                    </Stack>
-
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Box
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 2,
-                          bgcolor: "rgba(11,134,157,0.12)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "primary.main",
-                          flex: "0 0 auto",
-                        }}
-                      >
-                        <PhoneInTalkOutlinedIcon fontSize="small" />
-                      </Box>
-                      <Box>
-                        <Typography variant="body2">
-                          +1 (555) 123 4567
-                        </Typography>
-                        <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                          Mon – Fri, 9am – 6pm
-                        </Typography>
-                      </Box>
-                    </Stack>
-
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Box
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 2,
-                          bgcolor: "rgba(11,134,157,0.12)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "primary.main",
-                          flex: "0 0 auto",
-                        }}
-                      >
-                        <LocationOnOutlinedIcon fontSize="small" />
-                      </Box>
-                      <Box>
-                        <Typography variant="body2">
-                          99 Medical Park, Chicago
-                        </Typography>
-                        <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                          Illinois, United States
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </Stack>
-                </Paper>
-
+          <Grid container spacing={4}>
+            <Grid item xs={12}>
+              <Fade in timeout={520}>
                 <Box
                   sx={{
-                    flex: 1,
-                    minHeight: { xs: 180, sm: 220, md: 260 },
-                    borderRadius: 4,
-                    overflow: "hidden",
-                    position: "relative",
-                    background:
-                      "url(https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=60) center/cover",
-                    boxShadow: "0 10px 24px rgba(9,19,33,0.10)",
+                    display: "flex",
+                    flexDirection: { xs: "column", md: "row" },
+                    gap: 3,
+                    width: "145%",
+                    minHeight: { xs: 360, md: 260 },
                   }}
                 >
-                  <Box
+                  <Paper
+                    elevation={0}
                     sx={{
-                      position: "absolute",
-                      inset: 0,
-                      background:
-                        "linear-gradient(120deg, #0f7c90bb 0%, #0f243500 70%)",
+                      flex: { xs: "1 1 100%", md: "0 0 40%" },
+                      p: 3,
+                      borderRadius: 4,
+                      background: "rgba(255,255,255,0.92)",
+                      border: "1px solid rgba(15,124,144,0.06)",
+                      boxShadow: "0 10px 24px rgba(15,124,144,0.08)",
                     }}
-                  />
-                  <Box sx={{ position: "absolute", bottom: 16, left: 16 }}>
+                  >
                     <Typography
                       variant="subtitle2"
-                      sx={{ color: "#fff", mb: 0.5 }}
+                      sx={{ opacity: 0.65, mb: 2 }}
                     >
-                      Our clinic location
+                      Contact details
                     </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "#fff", opacity: 0.9 }}
-                    >
-                      Easily accessible, parking available
-                    </Typography>
+
+                    <Stack spacing={2}>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Box
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 2,
+                            bgcolor: "rgba(11,134,157,0.12)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "primary.main",
+                          }}
+                        >
+                          <EmailOutlinedIcon fontSize="small" />
+                        </Box>
+                        <Box>
+                          <Typography variant="body2">
+                            hello@cloudcare.com
+                          </Typography>
+                          <Typography variant="caption" sx={{ opacity: 0.6 }}>
+                            for appointments & support
+                          </Typography>
+                        </Box>
+                      </Stack>
+
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Box
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 2,
+                            bgcolor: "rgba(11,134,157,0.12)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "primary.main",
+                          }}
+                        >
+                          <PhoneInTalkOutlinedIcon fontSize="small" />
+                        </Box>
+                        <Box>
+                          <Typography variant="body2">
+                            +1 (555) 123 4567
+                          </Typography>
+                          <Typography variant="caption" sx={{ opacity: 0.6 }}>
+                            Mon – Fri, 9am – 6pm
+                          </Typography>
+                        </Box>
+                      </Stack>
+
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Box
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 2,
+                            bgcolor: "rgba(11,134,157,0.12)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "primary.main",
+                          }}
+                        >
+                          <LocationOnOutlinedIcon fontSize="small" />
+                        </Box>
+                        <Box>
+                          <Typography variant="body2">
+                            99 Medical Park, Chicago
+                          </Typography>
+                          <Typography variant="caption" sx={{ opacity: 0.6 }}>
+                            Illinois, United States
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Stack>
+                  </Paper>
+
+                  <Box
+                    sx={{
+                      flex: { xs: "1 1 100%", md: "1 1 60%" },
+                      borderRadius: 4,
+                      overflow: "hidden",
+                      position: "relative",
+                      backgroundImage:
+                        "url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=60')",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      minHeight: { xs: 180, sm: 220, md: 260 },
+                      boxShadow: "0 10px 24px rgba(9,19,33,0.10)",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(120deg, #0f7c90bb 0%, #0f243500 70%)",
+                      }}
+                    />
+                    <Box sx={{ position: "absolute", bottom: 16, left: 16 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ color: "#fff", mb: 0.5 }}
+                      >
+                        Our clinic location
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "#fff", opacity: 0.9 }}
+                      >
+                        Easily accessible, parking available
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
-              </Box>
-            </Fade>
+              </Fade>
+            </Grid>
           </Grid>
         </Grid>
       </Container>

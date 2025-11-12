@@ -1,4 +1,3 @@
-// src/pages/SeniorCareHelp.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -17,6 +16,7 @@ import {
   Paper,
 } from "@mui/material";
 import api from "../api/axios.js";
+import Contact from "./Contact.jsx";
 
 const FEATURE_SECTIONS = [
   {
@@ -90,7 +90,6 @@ const SeniorCareHelp = () => {
 
   return (
     <>
-      {/* HERO */}
       <Box
         sx={{
           background:
@@ -169,7 +168,6 @@ const SeniorCareHelp = () => {
         </Container>
       </Box>
 
-      {/* FEATURES GRID */}
       <Box sx={{ py: { xs: 5, md: 6 }, background: "#f5f8fb" }}>
         <Container maxWidth="lg">
           <Paper
@@ -255,156 +253,7 @@ const SeniorCareHelp = () => {
           </Grid>
         </Container>
       </Box>
-
-      {/* DEMO / CONTACT */}
-      <Box
-        id="demo"
-        sx={{
-          py: { xs: 5, md: 6 },
-          background: "linear-gradient(180deg, #e7f6f9 0%, #f9fbfc 70%)",
-        }}
-      >
-        <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="stretch">
-            {/* form */}
-            <Grid item xs={12} md={6}>
-              <Typography
-                variant="h4"
-                sx={{ fontWeight: 700, mb: 1, color: "#0f172a" }}
-              >
-                Get in touch with us for a demo!
-              </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.7, mb: 3 }}>
-                One of our team will be in contact with you shortly.
-              </Typography>
-
-              <Box component="form" onSubmit={handleSubmit}>
-                {sent && (
-                  <Alert
-                    severity="success"
-                    sx={{ mb: 2, borderRadius: 2 }}
-                    onClose={() => setSent(false)}
-                  >
-                    Thank you! We will be in touch soon.
-                  </Alert>
-                )}
-
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Full Name"
-                      name="name"
-                      fullWidth
-                      required
-                      value={form.name}
-                      onChange={handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Email"
-                      name="email"
-                      type="email"
-                      fullWidth
-                      required
-                      value={form.email}
-                      onChange={handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Phone"
-                      name="phone"
-                      fullWidth
-                      value={form.phone}
-                      onChange={handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Organization / Facility"
-                      name="org"
-                      fullWidth
-                      value={form.org}
-                      onChange={handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Tell us what you're trying to fix"
-                      name="message"
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={form.message}
-                      onChange={handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      disabled={sending}
-                      sx={{
-                        borderRadius: 999,
-                        px: 4,
-                        py: 1.1,
-                        textTransform: "none",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {sending ? "Sending..." : "Submit"}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
-
-              <Typography
-                variant="caption"
-                sx={{ display: "block", mt: 2, opacity: 0.55 }}
-              >
-                By submitting you agree you may receive SMS messages. Msg/data
-                rates may apply.
-              </Typography>
-            </Grid>
-
-            {/* illustration */}
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  height: "100%",
-                  borderRadius: 4,
-                  background:
-                    "linear-gradient(160deg, rgba(5,99,123,0.12) 0%, rgba(5,99,123,0.0) 45%), url(https://images.unsplash.com/photo-1604691887309-456a5c13904e?auto=format&fit=crop&w=1400&q=70) center/cover",
-                  minHeight: 260,
-                  position: "relative",
-                  overflow: "hidden",
-                }}
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    inset: 0,
-                    background:
-                      "radial-gradient(circle at bottom, rgba(15,23,42,0.15) 0%, rgba(15,23,42,0) 55%)",
-                  }}
-                />
-                <Box sx={{ position: "absolute", bottom: 18, left: 18 }}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: "#fff", mb: 0.5 }}
-                  >
-                    Multi-property visibility
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#fff" }}>
-                    Owners can monitor multiple group homes from phone.
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
+      <Contact />
     </>
   );
 };
