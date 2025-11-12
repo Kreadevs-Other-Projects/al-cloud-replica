@@ -41,6 +41,7 @@ const AppointmentForm = () => {
         setServices(arr);
       })
       .catch(() => {});
+
     api
       .get("/api/doctors")
       .then((res) => {
@@ -193,13 +194,13 @@ const AppointmentForm = () => {
               handleChange(e);
               setForm((prev) => ({ ...prev, doctor: "" }));
             }}
-            fullWidth
             required
-            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
+            SelectProps={{ displayEmpty: true }}
+            sx={{
+              "& .MuiOutlinedInput-root": { borderRadius: 3 },
+              width: "240px",
+            }}
           >
-            <MenuItem selected={true} value="Select Service">
-              Select Service
-            </MenuItem>
             {services.map((s) => (
               <MenuItem key={s._id} value={s._id}>
                 {s.title}
@@ -215,13 +216,13 @@ const AppointmentForm = () => {
             name="doctor"
             value={form.doctor}
             onChange={handleChange}
-            fullWidth
             required
-            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
+            SelectProps={{ displayEmpty: true }}
+            sx={{
+              "& .MuiOutlinedInput-root": { borderRadius: 3 },
+              width: "240px",
+            }}
           >
-            <MenuItem selected={true} value="Select Doctor">
-              Select Doctor
-            </MenuItem>
             {filteredDoctors.map((d) => (
               <MenuItem key={d._id} value={d._id}>
                 {d.name} {!!d.specialty && `— ${d.specialty}`}
@@ -250,21 +251,6 @@ const AppointmentForm = () => {
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           />
         </Grid>
-
-        {/* Optional Notes */}
-        {/* <Grid item xs={12} md={7}>
-          <TextField
-            label="Notes / Symptoms / Message"
-            name="notes"
-            value={form.notes}
-            onChange={handleChange}
-            fullWidth
-            multiline
-            rows={3}
-            placeholder="Tell us what you’re feeling or what you need..."
-            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
-          />
-        </Grid> */}
 
         <Grid
           item
