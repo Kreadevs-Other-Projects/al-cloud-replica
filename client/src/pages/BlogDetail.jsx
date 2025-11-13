@@ -11,27 +11,44 @@ import {
 } from "@mui/material";
 import { useParams, Link as RouterLink } from "react-router-dom";
 import api from "../api/axios.js";
+import { FALLBACK_BLOGS } from "../constants/blogs.js";
 
 const BlogDetail = () => {
   const { slug } = useParams();
   const [post, setPost] = useState(null);
 
   useEffect(() => {
-    api
-      .get(`/api/blogs/slug/${slug}`)
-      .then((res) => {
-        const d = res.data;
-        setPost({
-          title: d.title,
-          date: new Date(d.createdAt).toLocaleDateString(),
-          authorName: d.author?.name || "CloudCare Editorial",
-          content: d.content || d.excerpt || "",
-        });
-      })
-      .catch((err) => {
-        console.error("Failed to fetch blog detail:", err);
-        setPost(null);
+    // api
+    //   .get(`/api/blogs/slug/${slug}`)
+    //   .then((res) => {
+    //     const d = res.data;
+    //     setPost({
+    //       title: d.title,
+    //       date: new Date(d.createdAt).toLocaleDateString(),
+    //       authorName: d.author?.name || "CloudCare Editorial",
+    //       content: d.content || d.excerpt || "",
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     console.error("Failed to fetch blog detail:", err);
+    //     setPost(null);
+    //   });
+
+    // Use fallback dummy data instead
+    const fallback = FALLBACK_BLOGS.find((b) => b.slug === slug);
+    if (fallback) {
+      setPost({
+        title: fallback.title,
+        date: fallback.date,
+        authorName: fallback.author,
+        content: fallback.excerpt,
+        image: fallback.image,
+        readTime: fallback.readTime,
+        category: fallback.category,
       });
+    } else {
+      setPost(null);
+    }
   }, [slug]);
 
   if (!post) return <Typography>Loading...</Typography>;

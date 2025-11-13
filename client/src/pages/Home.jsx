@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -15,6 +14,9 @@ import TestimonialSlider from "../components/TestimonialSlider.jsx";
 import BlogCard from "../components/BlogCard.jsx";
 import Pricing from "../components/Pricing.jsx";
 import api from "../api/axios.js";
+import { FALLBACK_SERVICES } from "../constants/services.js";
+import { FALLBACK_DOCTORS } from "../constants/doctor.js";
+import { FALLBACK_BLOGS } from "../constants/blogs.js";
 
 const Home = () => {
   const [services, setServices] = useState([]);
@@ -30,12 +32,12 @@ const Home = () => {
         if (Array.isArray(res.data) && res.data.length > 0) {
           setServices(res.data.slice(0, 6));
         } else {
-          setServices([]);
+          setServices(FALLBACK_SERVICES);
         }
       })
       .catch((err) => {
         console.warn("services api failed:", err);
-        setServices([]);
+        setServices(FALLBACK_SERVICES);
       });
 
     api
@@ -50,25 +52,35 @@ const Home = () => {
         if (doctorItems.length > 0) {
           setDoctors(doctorItems.slice(0, 4));
         } else {
-          setDoctors([]);
+          setDoctors(FALLBACK_DOCTORS);
         }
       })
       .catch((err) => {
         console.warn("doctors api failed:", err);
-        setDoctors([]);
+        setDoctors(FALLBACK_DOCTORS);
       });
 
-    api
-      .get("/api/blogs")
-      .then((res) => {
-        console.log("blogs api:", res.data);
-        const blogItems = Array.isArray(res.data.items) ? res.data.items : [];
-        setBlogs(blogItems.slice(0, 3));
-      })
-      .catch((err) => {
-        console.warn("blogs api failed:", err);
-        setBlogs([]);
-      });
+    api;
+    //   .get("/api/blogs")
+    //   .then((res) => {
+    //     console.log("blogs api:", res.data);
+    //     const blogItems = Array.isArray(res.data.items)
+    //       ? res.data.items
+    //       : Array.isArray(res.data)
+    //       ? res.data
+    //       : [];
+    //     if (blogItems.length > 0) {
+    //       setBlogs(blogItems.slice(0, 3));
+    //     } else {
+    //       setBlogs(FALLBACK_BLOGS.slice(0, 3));
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.warn("blogs api failed:", err);
+    //     setBlogs(FALLBACK_BLOGS.slice(0, 3));
+    //   });
+
+    setBlogs(FALLBACK_BLOGS.slice(0, 3));
   }, []);
 
   return (

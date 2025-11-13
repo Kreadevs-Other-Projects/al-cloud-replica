@@ -15,6 +15,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import SectionTitle from "../components/SectionTitle.jsx";
 import DoctorCard from "../components/DoctorCard.jsx";
 import api from "../api/axios.js";
+import { FALLBACK_DOCTORS } from "../constants/doctor.js";
 
 const Doctors = () => {
   const [data, setData] = useState({ items: [], total: 0, page: 1, pages: 1 });
@@ -30,15 +31,37 @@ const Doctors = () => {
     let ignore = false;
     setLoading(true);
     setErr("");
+
     api
       .get("/api/doctors", {
         params: { q, specialty, page, limit, active: true },
       })
       .then((res) => {
-        if (!ignore) setData(res.data);
+        if (!ignore) {
+          if (res.data?.items?.length > 0) {
+            setData(res.data);
+          } else {
+            setData({
+              items: FALLBACK_DOCTORS,
+              total: FALLBACK_DOCTORS.length,
+              page: 1,
+              pages: 1,
+            });
+          }
+        }
       })
-      .catch(() => !ignore && setErr("Could not load doctors"))
+      .catch(() => {
+        if (!ignore) {
+          setData({
+            items: FALLBACK_DOCTORS,
+            total: FALLBACK_DOCTORS.length,
+            page: 1,
+            pages: 1,
+          });
+        }
+      })
       .finally(() => !ignore && setLoading(false));
+
     return () => (ignore = true);
   }, [q, specialty, page]);
 

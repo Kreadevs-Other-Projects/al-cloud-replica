@@ -13,13 +13,10 @@ import { useNavigate } from "react-router-dom";
 const BlogCard = ({ item, index = 0 }) => {
   const navigate = useNavigate();
 
-  const imageSrc =
-    "https://images.unsplash.com/photo-1581090700227-1e37b190418e?auto=format&fit=crop&w=1200&q=60";
-
   return (
     <Card
       sx={{
-        width: 400,
+        width: 368,
         borderRadius: 4,
         overflow: "hidden",
         position: "relative",
@@ -57,7 +54,7 @@ const BlogCard = ({ item, index = 0 }) => {
         <Box sx={{ position: "relative", overflow: "hidden" }}>
           <CardMedia
             component="img"
-            image={imageSrc}
+            image={item.image}
             alt={item.title}
             className="blog-img"
             sx={{
@@ -114,11 +111,15 @@ const BlogCard = ({ item, index = 0 }) => {
               lineHeight: 1.5,
             }}
           >
-            {item.excerpt
-              ? item.excerpt.length > 120
-                ? item.excerpt.slice(0, 120) + "..."
-                : item.excerpt
-              : "Read how modern digital care is changing healthcare for patients, clinics and remote teams."}
+            <span
+              dangerouslySetInnerHTML={{
+                __html: item.excerpt
+                  ? item.excerpt.length > 120
+                    ? item.excerpt.slice(0, 120) + "..."
+                    : item.excerpt
+                  : "Read how modern digital care is changing healthcare for patients, clinics and remote teams.",
+              }}
+            />
           </Typography>
 
           <Box

@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import BlogCard from "../components/BlogCard.jsx";
 import api from "../api/axios.js";
+import { FALLBACK_BLOGS } from "../constants/blogs.js";
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -18,18 +19,35 @@ const Blogs = () => {
   const [pages, setPages] = useState(1);
 
   useEffect(() => {
-    api
-      .get(`/api/blogs?page=${page}&limit=9`)
-      .then((res) => {
-        const items = Array.isArray(res.data?.items) ? res.data.items : [];
-        setBlogs(items);
-        setPages(res.data.pages || 1);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch blogs:", err);
-        setBlogs([]);
-        setPages(1);
-      });
+    let ignore = false;
+
+    // api
+    //   .get(`/api/blogs?page=${page}&limit=9`)
+    //   .then((res) => {
+    //     if (ignore) return;
+    //     const items = Array.isArray(res.data?.items) ? res.data.items : [];
+    //     if (items.length > 0) {
+    //       setBlogs(items);
+    //       setPages(res.data.pages || 1);
+    //     } else {
+    //       setBlogs(FALLBACK_BLOGS);
+    //       setPages(1);
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     if (ignore) return;
+    //     console.error("Failed to fetch blogs:", err);
+    //     setBlogs(FALLBACK_BLOGS);
+    //     setPages(1);
+    //   });
+
+    // Use fallback blogs only
+    if (!ignore) {
+      setBlogs(FALLBACK_BLOGS);
+      setPages(1);
+    }
+
+    return () => (ignore = true);
   }, [page]);
 
   return (
@@ -63,7 +81,7 @@ const Blogs = () => {
         <Container maxWidth="lg">
           <Grid container spacing={3}>
             {blogs.map((b) => (
-              <Grid key={b._id || b.slug} item xs={12} sm={6} md={4}>
+              <Grid item xs={12} sm={4} md={4}>
                 <BlogCard item={b} />
               </Grid>
             ))}

@@ -12,6 +12,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import SectionTitle from "../components/SectionTitle.jsx";
 import ServiceCard from "../components/ServiceCard.jsx";
 import api from "../api/axios.js";
+import { FALLBACK_SERVICES } from "../constants/services.js";
 
 const Services = () => {
   const [list, setList] = useState([]);
@@ -23,13 +24,26 @@ const Services = () => {
     let ignore = false;
     setLoading(true);
     setErr("");
+
     api
       .get(`/api/services`, { params: { active: true, q } })
       .then((res) => {
-        if (!ignore) setList(Array.isArray(res.data) ? res.data : []);
+        if (!ignore) {
+          const data = Array.isArray(res.data) ? res.data : [];
+          if (data.length > 0) {
+            setList(data);
+          } else {
+            setList(FALLBACK_SERVICES);
+          }
+        }
       })
-      .catch(() => !ignore && setErr("Could not load services"))
+      .catch(() => {
+        if (!ignore) {
+          setList(FALLBACK_SERVICES);
+        }
+      })
       .finally(() => !ignore && setLoading(false));
+
     return () => (ignore = true);
   }, [q]);
 
