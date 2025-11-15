@@ -1,4 +1,3 @@
-// src/layout/Navbar.jsx
 import React from "react";
 import {
   AppBar,
@@ -26,15 +25,11 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // dropdown state
   const [solutionsAnchor, setSolutionsAnchor] = React.useState(null);
 
-  // TOP LEVEL NAV (desktop)
-  // order: Home, Services, Solutions (dropdown), Pricing, Doctors, Appointment, Blog, Contact
   const topLinks = [
     { label: "Home", to: "/" },
     { label: "Services", to: "/services" },
-    // Solutions is special (dropdown) – we won't map it here
     { label: "Pricing", to: "/pricing" },
     { label: "Doctors", to: "/doctors" },
     { label: "Appointment", to: "/appointment" },
@@ -42,7 +37,6 @@ const Navbar = () => {
     { label: "Contact", to: "/contact" },
   ];
 
-  // dropdown content (merged previous sub-navbar pages)
   const solutionLinks = [
     { label: "Modules / Features", to: "/modules" },
     { label: "ALF / Senior Care", to: "/senior-care" },
@@ -51,7 +45,6 @@ const Navbar = () => {
     { label: "Privacy", to: "/privacy" },
   ];
 
-  // handlers for hover
   const handleSolutionsEnter = (event) => {
     setSolutionsAnchor(event.currentTarget);
   };
@@ -143,7 +136,6 @@ const Navbar = () => {
               );
             })}
 
-            {/* SOLUTIONS (DROPDOWN) */}
             <Box
               onMouseEnter={handleSolutionsEnter}
               onMouseLeave={handleSolutionsLeave}
@@ -198,7 +190,6 @@ const Navbar = () => {
                 Solutions
               </Button>
 
-              {/* dropdown menu */}
               <Menu
                 anchorEl={solutionsAnchor}
                 open={isSolutionsOpen}
@@ -241,7 +232,6 @@ const Navbar = () => {
               </Menu>
             </Box>
 
-            {/* rest of links: Pricing, Doctors, Appointment, Blog, Contact */}
             {topLinks.slice(2).map((item) => {
               const active = location.pathname === item.to;
               return (
@@ -287,7 +277,6 @@ const Navbar = () => {
             })}
           </Box>
 
-          {/* Right side auth buttons (desktop) */}
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
             {user ? (
               <>
@@ -332,7 +321,6 @@ const Navbar = () => {
             )}
           </Box>
 
-          {/* Mobile toggle */}
           <IconButton
             sx={{
               display: { xs: "inline-flex", md: "none" },
@@ -346,7 +334,6 @@ const Navbar = () => {
         </Toolbar>
       </AppBar>
 
-      {/* MOBILE DRAWER */}
       <Drawer
         anchor="left"
         open={openDrawer}
@@ -369,7 +356,6 @@ const Navbar = () => {
         </Box>
         <Divider sx={{ mb: 1 }} />
         <List>
-          {/* main links */}
           {topLinks.map((item) => (
             <ListItemButton
               key={item.to}
@@ -383,7 +369,6 @@ const Navbar = () => {
             </ListItemButton>
           ))}
 
-          {/* solutions group */}
           <Divider sx={{ my: 1 }} />
           <ListItemText
             primary="Solutions"

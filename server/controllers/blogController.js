@@ -53,15 +53,34 @@ export const getBlogBySlug = async (req, res) => {
 
 export const createBlog = async (req, res) => {
   try {
-    const blog = await Blog.create({ ...req.body, author: req.user._id });
+    console.log("📥 Incoming blog create request");
+    console.log("➡ req.body:", req.body);
+    console.log("➡ req.file:", req.file);
+    console.log("➡ req.user:", req.user);
+
+    const body = { ...req.body, author: req.user._id };
+
+    if (req.file) {
+      body.coverImage = `/uploads/${req.file.filename}`;
+    }
+
+    const blog = await Blog.create(body);
     res.status(201).json(blog);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error("❌ SERVER ERROR in createBlog:");
+    console.error(err);
+    res.status(500).json({ message: err.message });
   }
 };
 
 export const updateBlog = async (req, res) => {
-  const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+  const body = { ...req.body };
+
+  if (req.file) {
+    body.coverImage = `/uploads/${req.file.filename}`;
+  }
+
+  const blog = await Blog.findByIdAndUpdate(req.params.id, body, {
     new: true,
   });
   res.json(blog);

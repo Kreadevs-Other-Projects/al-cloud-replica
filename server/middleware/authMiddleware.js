@@ -13,13 +13,15 @@ export const protect = async (req, res, next) => {
       req.user = await User.findById(decoded.id).select("-password");
       return next();
     } catch (err) {
-      return res.status(401).json({ message: "Not authorized, token failed" });
+      console.error("🔥 Token verification failed:", err);
+      return next(new Error("Not authorized, token failed"));
     }
+  } else {
+    return next(new Error("Not authorized, no token"));
   }
-  return res.status(401).json({ message: "Not authorized, no token" });
 };
 
 export const admin = (req, res, next) => {
   if (req.user && req.user.role === "admin") return next();
-  return res.status(403).json({ message: "Admin access only" });
+  return next(new Error("Admin access only"));
 };

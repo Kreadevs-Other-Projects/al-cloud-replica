@@ -28,10 +28,14 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.get("/", (req, res) => {
   res.json({ message: "CloudCare API running" });
+});
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
 });
 
 app.use("/api/auth", authRoutes);
@@ -45,6 +49,10 @@ app.use("/api/upload", uploadRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
+app.use((err, req, res, next) => {
+  console.error("🔥 Global Error:", err);
+  res.status(500).json({ message: err.message || "Server Error" });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));

@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./layout/Navbar.jsx";
 import Footer from "./layout/Footer.jsx";
 import Home from "./pages/Home.jsx";
@@ -20,9 +20,17 @@ import Workflows from "./pages/Workflows.jsx";
 import Privacy from "./pages/Privacy.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import PricingPage from "./pages/PricingPage.jsx";
+import AdminPage from "./pages/Admin.jsx";
+import Management from "./pages/BlogEdit.jsx";
+
+import AdminLayout from "./layout/AdminLayout.jsx";
 
 const App = () => {
   const { user } = useAuth();
+
+  const isAdminRoute =
+    window.location.pathname.startsWith("/admin") ||
+    window.location.pathname.startsWith("/management");
 
   return (
     <Box
@@ -32,9 +40,37 @@ const App = () => {
         flexDirection: "column",
       }}
     >
-      <Navbar />
+      {!isAdminRoute && <Navbar />}
+
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Routes>
+          <Route
+            path="/admin"
+            element={(() => {
+              if (!user) {
+                return <Login redirectTo="/admin" />;
+              }
+              if (user.role !== "admin") {
+                return <Navigate to="/" replace />;
+              }
+
+              return (
+                <AdminLayout>
+                  <AdminPage />
+                </AdminLayout>
+              );
+            })()}
+          />
+
+          <Route
+            path="/management"
+            element={
+              <AdminLayout>
+                <Management />
+              </AdminLayout>
+            }
+          />
+
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
           <Route path="/doctors" element={<Doctors />} />
@@ -43,11 +79,7 @@ const App = () => {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/dashboard"
-            element={user ? <Dashboard /> : <Login redirectTo="/dashboard" />}
-          />
-          {/* New Pages */}
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/modules" element={<Modules />} />
           <Route path="/senior-care" element={<SeniorCareHelp />} />
           <Route path="/pharmacy-focus" element={<PharmacyFocus />} />
@@ -57,7 +89,8 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>
-      <Footer />
+
+      {!isAdminRoute && <Footer />}
     </Box>
   );
 };
